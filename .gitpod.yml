@@ -6,8 +6,8 @@ tasks:
 
 vscode:
   extensions:
-    - elmTooling.elm-ls-vscode@1.5.2:c4SjSdO75JSK2fQR62ntDQ==
     - sainnhe.gruvbox-material@6.3.4:xikN80QXpALc8RsrrwRtCg==
     - zhuangtongfa.material-theme@3.9.3:L+bizDKGIozpoYYkuSO1Fg==
     - johnpapa.winteriscoming@1.4.3:RUhqzEkjA39t5TOfnBGZVw==
     - Tomi.greenblue-theme@0.1.0:Cv0RErkr+ZD0rsB9sITr5g==
+    - elmtooling.elm-ls-vscode
