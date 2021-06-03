@@ -1,5 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
+    <script>
+        class RangeSlider extends HTMLElement {
+            connectedCallback() {
+                var input = document.createElement("input");
+                this.appendChild(input);
+
+                var jsr = new JSR(input, {
+                    max: this.max,
+                    values: [this.val],
+                    sliders: 1,
+                    grid: false
+                });
+
+                var rangeSliderNode = this;
+
+                jsr.addEventListener("update", function(elem, value) {
+                    var event = new CustomEvent("slide", {
+                        detail: {userSlidTo: value}
+                    });
+
+                    rangeSliderNode.dispatchEvent(event);
+                })
+            }
+        }
+
+        window.customElements.define("range-slider", RangeSlider);
+    </script>
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -11,6 +38,7 @@
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico">
+    <script src="range-slider.js"></script>
     <title>Elm App</title>
 </head>
 <body>
