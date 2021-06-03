@@ -11,6 +11,7 @@ import Json.Encode as Encode
 import Random
 
 
+urlPrefix : String
 urlPrefix =
     "http://elm-in-action.com/"
 
@@ -189,9 +190,7 @@ update msg model =
         GotPhotos (Ok photos) ->
             case photos of
                 first :: _ ->
-                    ( { model | status = Loaded photos first.url }
-                    , Cmd.none
-                    )
+                    applyFilters { model | status = Loaded photos first.url }
 
                 [] ->
                     ( { model | status = Errored "0 photos found" }, Cmd.none )
@@ -200,19 +199,13 @@ update msg model =
             ( { model | status = Errored "Errored out!" }, Cmd.none )
 
         SlidHue hue ->
-            ( { model | hue = hue }
-            , Cmd.none
-            )
+            applyFilters { model | hue = hue }
 
         SlidRipple ripple ->
-            ( { model | ripple = ripple }
-            , Cmd.none
-            )
+            applyFilters { model | ripple = ripple }
 
         SlidNoise noise ->
-            ( { model | noise = noise }
-            , Cmd.none
-            )
+            applyFilters { model | noise = noise }
 
 
 applyFilters : Model -> ( Model, Cmd Msg )
