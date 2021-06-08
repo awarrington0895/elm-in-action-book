@@ -1,8 +1,8 @@
 import "./main.css";
-import { Elm } from "./Main.elm";
+import { Elm } from "./PhotoGroove.elm";
 import * as serviceWorker from "./serviceWorker";
 
-const app = Elm.Main.init({
+const app = Elm.PhotoGroove.init({
   node: document.getElementById("root"),
   flags: Pasta.version,
 });
