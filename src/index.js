@@ -4,6 +4,7 @@ import * as serviceWorker from "./serviceWorker";
 
 const app = Elm.Main.init({
   node: document.getElementById("root"),
+  flags: Pasta.version,
 });
 
 app.ports.setFilters.subscribe((options) => {
