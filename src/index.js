@@ -1,15 +1,19 @@
-import './main.css';
-import { Elm } from './Main.elm';
-import * as serviceWorker from './serviceWorker';
+import "./main.css";
+import { Elm } from "./Main.elm";
+import * as serviceWorker from "./serviceWorker";
 
 const app = Elm.Main.init({
-  node: document.getElementById('root')
+  node: document.getElementById("root"),
 });
 
-app.ports.setFilters.subscribe(options => {
+app.ports.setFilters.subscribe((options) => {
   requestAnimationFrame(() => {
     Pasta.apply(document.getElementById("main-canvas"), options);
   });
+});
+
+Pasta.addActivityListener((activity) => {
+  app.ports.activityChanges.send(activity);
 });
 
 // If you want your app to work offline and load faster, you can change
