@@ -2,10 +2,14 @@ module PhotoGrooveTests exposing (..)
 
 import Expect
 import Fuzz exposing (Fuzzer, int, list, string)
+import Html.Attributes as Attr exposing (src)
 import Json.Decode as Decode exposing (decodeValue)
 import Json.Encode as Encode
-import PhotoGroove exposing (Model, Msg(..), initialModel, update)
+import PhotoGroove exposing (Model, Msg(..), Photo, Status(..), initialModel, update, urlPrefix, view)
 import Test exposing (..)
+import Test.Html.Event as Event
+import Test.Html.Query as Query
+import Test.Html.Selector exposing (attribute, tag, text)
 
 
 
@@ -54,3 +58,75 @@ slidHueSetsHue =
                 |> Tuple.first
                 |> .hue
                 |> Expect.equal amount
+
+
+noPhotosNoThumbnails : Test
+noPhotosNoThumbnails =
+    test "No thumbnails render when there are no photos to render." <|
+        \_ ->
+            initialModel
+                |> PhotoGroove.view
+                |> Query.fromHtml
+                |> Query.findAll [ tag "img" ]
+                |> Query.count (Expect.equal 0)
+
+
+thumbnailRendered : String -> Query.Single msg -> Expect.Expectation
+thumbnailRendered url query =
+    query
+        |> Query.findAll [ tag "img", attribute (Attr.src (urlPrefix ++ url)) ]
+        |> Query.count (Expect.atLeast 1)
+
+
+photoFromUrl : String -> Photo
+photoFromUrl url =
+    { url = url, size = 0, title = "" }
+
+
+thumbnailsWork : Test
+thumbnailsWork =
+    fuzz urlFuzzer "URLs render as thumbnails" <|
+        \urls ->
+            let
+                thumbnailChecks : List (Query.Single msg -> Expect.Expectation)
+                thumbnailChecks =
+                    List.map thumbnailRendered urls
+            in
+            { initialModel | status = Loaded (List.map photoFromUrl urls) "" }
+                |> view
+                |> Query.fromHtml
+                |> Expect.all thumbnailChecks
+
+
+urlFuzzer : Fuzzer (List String)
+urlFuzzer =
+    Fuzz.intRange 1 5
+        |> Fuzz.map urlsFromCount
+
+
+urlsFromCount : Int -> List String
+urlsFromCount urlCount =
+    List.range 1 urlCount
+        |> List.map (\num -> String.fromInt num ++ ".png")
+
+
+clickThumbnail : Test
+clickThumbnail =
+    fuzz3 urlFuzzer string urlFuzzer "clicking a thumbnail selects it" <|
+        \urlsBefore urlToSelect urlsAfter ->
+            let
+                url =
+                    urlToSelect ++ ".jpeg"
+
+                photos =
+                    (urlsBefore ++ url :: urlsAfter) |> List.map photoFromUrl
+
+                srcToClick =
+                    urlPrefix ++ url
+            in
+            { initialModel | status = Loaded photos "" }
+                |> view
+                |> Query.fromHtml
+                |> Query.find [ tag "img", attribute (Attr.src srcToClick) ]
+                |> Event.simulate Event.click
+                |> Event.expect (ClickedPhoto url)
